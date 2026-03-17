@@ -64,7 +64,7 @@ Tecnologie:
 
 # 🔐 Authentication
 
-Supporta due metodi di autenticazione:
+Supporta tre metodi di autenticazione:
 
 ### Username / Password
 Gestito tramite:
@@ -79,6 +79,31 @@ Utilizza:
 - Google Identity Services
 - OAuth2
 - Verifica ID Token lato backend
+
+### GitHub Login
+
+Utilizza:
+- GitHub OAuth2
+- Authorization Code Flow
+- Scambio code → access token lato backend
+- Recupero dati utente tramite API GitHub
+- Generazione JWT lato backend
+---
+# Ruoli
+Il sistema prevede un modello di autorizzazione basato su ruoli, gestito tramite Spring Security e token JWT.
+Ad ogni utente autenticato viene assegnato un ruolo, che determina i permessi di accesso alle risorse.
+
+Sono definiti due ruoli principali:
+ • ARTIST: utente standard che può gestire le proprie tracce (upload, submit, publish, streaming)
+ • ADMIN: utente con privilegi estesi, che può accedere ad endpoint amministrativi dedicati
+
+Il ruolo viene determinato lato backend durante il processo di autenticazione e inserito nel contesto di sicurezza.
+Gli endpoint sono protetti tramite configurazione Spring Security, ad esempio:
+ • /auth/** → accesso pubblico
+ • /admin/** → accesso consentito solo a utenti con ruolo ADMIN
+ • altri endpoint → richiedono autenticazione
+
+Questo approccio garantisce separazione dei permessi e controllo degli accessi coerente con l’architettura a microservizi.
 
 ---
 
@@ -162,6 +187,8 @@ Auth
 POST /auth/register
 POST /auth/login
 POST /auth/google
+GET /auth/github/login
+GET /auth/github/callback
 ```
 
 Tracks
@@ -192,7 +219,10 @@ POST   /royalties/init
 GET    /royalties/{trackId}
 POST   /royalties/{trackId}/stream
 ```
-
+Admin
+```
+GET admin/ping
+``` 
 ## Idempotency
 Endpoint interessato:
 ```

@@ -38,14 +38,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 try {
   String username = jwt.extractUsername(token);
   UUID artistId = jwt.extractArtistId(token);
+  String role = jwt.extractRole(token);
 
   var authentication = new UsernamePasswordAuthenticationToken(
       username,
       null,
-      List.of(new SimpleGrantedAuthority("ROLE_ARTIST"))
+      List.of(new SimpleGrantedAuthority("ROLE_" + role))
   );
 
-  authentication.setDetails(artistId); // <-- aggiungi questa riga
+  authentication.setDetails(artistId);
 
   SecurityContextHolder.getContext().setAuthentication(authentication);
 } catch (Exception e) {

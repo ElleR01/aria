@@ -25,13 +25,15 @@ public class JwtService {
     this.expMinutes = expMinutes;
   }
 
-  public String generateToken(String username, UUID artistId) {
+  // AGGIORNATO: aggiunto ROLE
+  public String generateToken(String username, UUID artistId, String role) {
     Instant now = Instant.now();
     Instant exp = now.plusSeconds(expMinutes * 60);
 
     return Jwts.builder()
         .subject(username)
         .claim("artistId", artistId.toString())
+        .claim("role", role) // 👈 NUOVO
         .issuedAt(Date.from(now))
         .expiration(Date.from(exp))
         .signWith(key)
@@ -55,5 +57,16 @@ public class JwtService {
         .getPayload();
 
     return UUID.fromString(claims.get("artistId", String.class));
+  }
+
+  // NUOVO: estrazione ruolo
+  public String extractRole(String token) {
+    var claims = Jwts.parser()
+        .verifyWith(key)
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+
+    return claims.get("role", String.class);
   }
 }

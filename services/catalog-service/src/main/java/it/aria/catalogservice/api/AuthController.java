@@ -55,7 +55,8 @@ public class AuthController {
     String hash = encoder.encode(req.password());
     repo.save(new ArtistUser(req.username(), hash, artistId));
 
-    return new AuthResponse(jwt.generateToken(req.username(), artistId), artistId);
+    String role = resolveRole(req.username());
+    return new AuthResponse(jwt.generateToken(req.username(), artistId, role), artistId);
   }
 
   @PostMapping("/login")
@@ -67,7 +68,8 @@ public class AuthController {
       throw new IllegalArgumentException("invalid credentials");
     }
 
-    return new AuthResponse(jwt.generateToken(user.getUsername(), user.getArtistId()), user.getArtistId());
+    String role = resolveRole(user.getUsername());
+    return new AuthResponse(jwt.generateToken(user.getUsername(), user.getArtistId(), role), user.getArtistId());
   }
 
   @PostMapping("/google")
@@ -96,9 +98,10 @@ public class AuthController {
       repo.save(user);
     }
 
+    String role = resolveRole(user.getUsername());
     return new AuthResponse(
-        jwt.generateToken(user.getUsername(), user.getArtistId()),
-        user.getArtistId()
+      jwt.generateToken(user.getUsername(), user.getArtistId(), role),
+      user.getArtistId()
     );
   }
   @GetMapping("/github/login")
@@ -130,9 +133,17 @@ public class AuthController {
       user = repo.save(new ArtistUser(username, randomHash, artistId));
     }
 
-    String jwtToken = jwt.generateToken(user.getUsername(), user.getArtistId());
+    String role = resolveRole(user.getUsername());
+    String jwtToken = jwt.generateToken(user.getUsername(), user.getArtistId(), role);
 
     response.sendRedirect("http://localhost:5173/login?token=" + jwtToken);
   }
+
+private String resolveRole(String username) {
+  if ("admin".equalsIgnoreCase(username) || "lore".equalsIgnoreCase(username)) {
+    return "ADMIN";
+  }
+  return "ARTIST";
+}
 
 }
