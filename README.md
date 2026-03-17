@@ -175,6 +175,7 @@ POST   /tracks/{trackId}/play
 DELETE /tracks/{trackId}
 GET    /tracks/{trackId}/stream
 ```
+
 Audio
 ```
 POST   /tracks/{trackId}/audio
@@ -192,6 +193,18 @@ POST   /royalties/init
 GET    /royalties/{trackId}
 POST   /royalties/{trackId}/stream
 ```
+## Idempotency
+Endpoint interessato:
+```
+POST   /tracks/{trackId}/play
+```
+L'idempotenza è gestita tramite l'header HTTP ```Idempotency-key```. Il client FrontEnd genera un identificatore univoco per ogni operazione di play:
+```
+headers: {
+  "Idempotency-Key": crypto.randomUUID()
+}
+```
+Evita la doppia contabilizzazione degli stream, così da evitare un incremento errato delle royalties
 
 ## Future Improvements
 - analytics reali
