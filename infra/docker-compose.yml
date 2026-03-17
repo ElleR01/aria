@@ -45,7 +45,7 @@ services:
       - minio_data:/data
 
   catalog-service:
-    build: ../services/catalog-service
+    image: lollo4216177/aria-catalog-service:latest
     ports:
       - "8081:8081"
     environment:
@@ -64,7 +64,7 @@ services:
       - minio
 
   rights-service:
-    build: ../services/rights-service
+    image: lollo4216177/aria-rights-service:latest
     ports:
       - "8082:8082"
     environment:
@@ -75,7 +75,7 @@ services:
       - rights-db
 
   royalties-service:
-    build: ../services/royalties-service
+    image: lollo4216177/aria-royalties-service:latest
     ports:
       - "8083:8083"
     environment:

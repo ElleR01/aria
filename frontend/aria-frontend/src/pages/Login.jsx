@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { setToken } from "../auth/token";
 import { apiFetch } from "../api/http";
 
@@ -10,6 +10,9 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
+  const [searchParams] = useSearchParams();
+
+
 
   async function submit(e) {
     e.preventDefault();
@@ -21,7 +24,7 @@ export default function Login() {
         body: JSON.stringify({ username, password }),
       });
 
-      const token = data.token||data.jwt||data.accessToken;
+      const token = data.token || data.jwt || data.accessToken;
 
       if (!token) throw new Error("Token non presente nella risposta");
 
@@ -31,6 +34,14 @@ export default function Login() {
       setErr(String(e2.message || e2));
     }
   }
+
+  useEffect(() => {
+    const tokenFromGithub = searchParams.get("token");
+    if (tokenFromGithub) {
+      setToken(tokenFromGithub);
+      nav("/");
+    }
+  }, [searchParams, nav]);
 
   useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -82,7 +93,7 @@ export default function Login() {
         }),
       });
 
-      const token = data.token|| data.jwt || data.accessToken;
+      const token = data.token || data.jwt || data.accessToken;
 
       if (!token) throw new Error("Token non presente nella risposta Google");
 
@@ -130,6 +141,15 @@ export default function Login() {
 
         <div className="flex justify-center">
           <div ref={googleBtnRef}></div>
+        </div>
+        <div className="mt-3 flex justify-center">
+          <button
+            type="button"
+            onClick={() => window.location.href = "http://localhost:8081/auth/github/login"}
+            className="w-[30%] rounded-xl p-2 bg-white/10 border border-white/10 text-black font-semibold hover:bg-white/20"
+          >
+            Continua con GitHub
+          </button>
         </div>
 
         <div className="mt-4 text-sm text-white/60">

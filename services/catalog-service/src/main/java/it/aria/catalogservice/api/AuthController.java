@@ -10,6 +10,8 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import jakarta.servlet.http.HttpServletResponse;
+import it.aria.catalogservice.security.GithubAuthService;
 
 import java.util.UUID;
 
@@ -21,17 +23,20 @@ public class AuthController {
   private final PasswordEncoder encoder;
   private final JwtService jwt;
   private final GoogleTokenVerifierService googleVerifier;
+  private final GithubAuthService githubAuthService;
 
   public AuthController(
       ArtistUserRepository repo,
       PasswordEncoder encoder,
       JwtService jwt,
-      GoogleTokenVerifierService googleVerifier
+      GoogleTokenVerifierService googleVerifier,
+      GithubAuthService githubAuthService
   ) {
     this.repo = repo;
     this.encoder = encoder;
     this.jwt = jwt;
     this.googleVerifier = googleVerifier;
+    this.githubAuthService = githubAuthService;
   }
 
   public record RegisterRequest(@NotBlank String username, @NotBlank String password) {}
@@ -96,4 +101,38 @@ public class AuthController {
         user.getArtistId()
     );
   }
+  @GetMapping("/github/login")
+  public void githubLogin(HttpServletResponse response) throws java.io.IOException {
+    response.sendRedirect(githubAuthService.buildAuthorizeUrl());
+  }
+
+  @GetMapping("/github/callback")
+  public void githubCallback(@RequestParam("code") String code, HttpServletResponse response) throws java.io.IOException {
+    String accessToken = githubAuthService.exchangeCodeForAccessToken(code);
+    var ghUser = githubAuthService.fetchUser(accessToken);
+
+    String username = (ghUser.email() != null && !ghUser.email().isBlank())
+        ? ghUser.email()
+        : ghUser.login();
+
+    if (username == null || username.isBlank()) {
+      throw new IllegalArgumentException("github account without usable username/email");
+    }
+
+    var existing = repo.findByUsername(username);
+
+    ArtistUser user;
+    if (existing.isPresent()) {
+      user = existing.get();
+    } else {
+      UUID artistId = UUID.randomUUID();
+      String randomHash = encoder.encode(UUID.randomUUID().toString());
+      user = repo.save(new ArtistUser(username, randomHash, artistId));
+    }
+
+    String jwtToken = jwt.generateToken(user.getUsername(), user.getArtistId());
+
+    response.sendRedirect("http://localhost:5173/login?token=" + jwtToken);
+  }
+
 }
