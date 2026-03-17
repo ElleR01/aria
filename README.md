@@ -166,10 +166,33 @@ POST /auth/google
 
 Tracks
 ```
-GET /tracks
-POST /tracks
-DELETE /tracks/{id}
+POST   /tracks
+GET    /tracks
+PUT    /tracks/{trackId}/submit
+PUT    /tracks/{trackId}/publish
+PUT    /tracks/{trackId}/publish-with-license
+POST   /tracks/{trackId}/play
+DELETE /tracks/{trackId}
+GET    /tracks/{trackId}/stream
 ```
+Audio
+```
+POST   /tracks/{trackId}/audio
+```
+
+Licenze
+```
+POST   /licenses
+GET    /licenses/by-track/{trackId}
+GET    /licenses/exists/{trackId}
+```
+Royalties
+```
+POST   /royalties/init
+GET    /royalties/{trackId}
+POST   /royalties/{trackId}/stream
+```
+
 ## Future Improvements
 - analytics reali
 - streaming pubblico
