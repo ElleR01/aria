@@ -177,7 +177,7 @@ npm run dev
  Frontedn disponibile su http://localhost:5173
 
 ## Enviroment variables
-Frontend .env
+IMPORTANTE per login con Google, Frontend .env
 ```
 VITE_GOOGLE_CLIENT_ID=your_google_client_id
 ```
