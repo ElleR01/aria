@@ -175,6 +175,7 @@ npm install
 npm run dev
 ```
  Frontedn disponibile su http://localhost:5173
+ IMPORTANTE: Aggiungere un file .env con ```VITE_GOOGLE_CLIENT_ID=276354781244-64oph92hm2d5mia0b4n43fkcmok49p41.apps.googleusercontent.com```
 
 ## Enviroment variables
 Frontend .env
