@@ -1,3 +1,5 @@
+
+name: aria
 services:
   catalog-db:
     image: postgres:16
