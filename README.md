@@ -168,6 +168,7 @@ Questo comando avvia PostgresSQL per i servizi di `catalog`, `rights` e `royalti
 - Rights: http://localhost:8082
 - Royalties: http://localhost:8083
 - MinIO: http://localhost:9001 (user: minio, pw: minio12345)
+IMPORTANTE: andare sulla console MinIO e creare il bucker `aria-audio`
 ## Frontend
 ```bash
 cd frontend
